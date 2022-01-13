@@ -1,0 +1,120 @@
+#include <SoftwareSerial.h>
+#define MR1 2
+#define MR2 3
+#define ML1 4
+#define ML2 5
+#define ENR 9 // right motor speed
+#define ENL 10 // left motor speed
+#define RX 12
+#define TX 11
+int spd = 5;
+SoftwareSerial Blue(RX, TX);
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  Blue.begin(9600);
+
+  pinMode(MR1, OUTPUT);
+  pinMode(MR2, OUTPUT);
+  pinMode(ML1, OUTPUT);
+  pinMode(ML2, OUTPUT);
+  
+  pinMode(ENR, OUTPUT);
+  pinMode(ENL, OUTPUT);
+}
+
+void loop() {
+  if(Blue.available()) {
+    char s = Blue.read();
+    set_speed(spd);
+    if(s == 'F') {
+      forward();
+    } else if(s == 'B') {
+      backward();
+    } else if(s == 'R') {
+      right();
+    } else if(s == 'L') {
+      left();
+    } else if(s == 'G') {
+      forward_left();
+    } else if(s == 'I') {
+      forward_right();
+    } else if(s == 'H') {
+      backward_left();
+    } else if(s == 'J') {
+      backward_right();
+    } else if(s == 'S') {
+      robo_stop();
+    } else if(s - '0' >= 0 && s - '0' <= 9) {
+      spd = s-'0';
+    } else if(s == 'q') {
+      spd = 10;
+    }
+  }
+  
+}
+
+void set_speed(int spd) {
+  analogWrite(ENR, (spd/10.0)*255);
+  analogWrite(ENL, (spd/10.0)*255);
+}
+
+void forward() {
+  digitalWrite(MR1, HIGH);
+  digitalWrite(MR2, LOW);
+
+  digitalWrite(ML1, HIGH);
+  digitalWrite(ML2, LOW);
+}
+
+void backward() {
+  digitalWrite(MR1, LOW);
+  digitalWrite(MR2, HIGH);
+
+  digitalWrite(ML1, LOW);
+  digitalWrite(ML2, HIGH);
+}
+
+void right() {
+  digitalWrite(MR1, LOW);
+  digitalWrite(MR2, HIGH);
+
+  digitalWrite(ML1, HIGH);
+  digitalWrite(ML2, LOW);
+}
+
+void left() {
+  digitalWrite(MR1, HIGH);
+  digitalWrite(MR2, LOW);
+
+  digitalWrite(ML1, LOW);
+  digitalWrite(ML2, HIGH);
+}
+
+void forward_left() {
+  forward();
+  analogWrite(ENL, ((spd/4.0)/10.0)*255);
+}
+
+void forward_right() {
+  forward();
+  analogWrite(ENR, ((spd/4.0)/10.0)*255);
+}
+
+void backward_left() {
+  backward();
+  analogWrite(ENL, ((spd/4.0)/10.0)*255);
+}
+
+void backward_right() {
+  backward();
+  analogWrite(ENR, ((spd/4.0)/10.0)*255);
+}
+
+void robo_stop() {
+  digitalWrite(MR1, LOW);
+  digitalWrite(MR2, LOW);
+
+  digitalWrite(ML1, LOW);
+  digitalWrite(ML2, LOW);
+}
